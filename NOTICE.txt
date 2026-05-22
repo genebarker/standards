@@ -1,0 +1,4 @@
+Eugene F. Barker - Project Standards
+Copyright © 2026 Eugene F. Barker.
+
+Licensed under the MIT License (MIT).

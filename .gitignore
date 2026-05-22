@@ -1,0 +1,8 @@
+# Agent working directory
+.antigravitycli/
+
+# macOS metadata and Finder files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
