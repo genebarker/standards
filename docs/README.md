@@ -24,8 +24,21 @@ In general, the files should be written so that they display well using an
   structure and as a bonus it renders well with most markdown tools
 - use `.md` for the file extension
 
+## Directory Structure
+
+- [decisions][5]: Architecture Decision Records (ADRs). Use
+  `decision-template.md` to author new decisions, and log them in
+  `decision-list.md`.
+- [usecases][6]: System use cases. Use `usecase-template.md` to author new
+  use cases.
+- [examples][7]: Practical reference examples showing formatting,
+  extensions, and list syntax.
+
 
 [1]: https://github.github.com/gfm/
 [2]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
 [3]: https://www.drawio.com
 [4]: http://staruml.io
+[5]: decisions/
+[6]: usecases/
+[7]: examples/

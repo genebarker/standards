@@ -1,4 +1,3 @@
-<!-- Derived from Eugene F. Barker (github.com/genebarker/standards) MIT -->
 # [Number] - [Title: Short Noun Phrase]
 
 ## Status

@@ -1,4 +1,3 @@
-<!-- Derived from Eugene F. Barker (github.com/genebarker/standards) MIT -->
 # 123 - Some Title
 
 Brief sentences describing context of use.

@@ -3,26 +3,27 @@
 
 *For personal reference only - issues and pull requests are closed.*
 
-A collection of pragmatic, contract-driven engineering and architecture
-standards designed to establish ecosystem-wide discipline without corporate
-bloat.
+A collection of pragmatic, contract-driven standards designed to keep
+your project documentation simple, clean, and less of a chore.
 
 ## Architectural Intent
 
-These standards exist to guide software development through simple,
-reusable, and absolute rules. We value:
+These standards provide a practical starting point for project
+documentation, delivering:
 
 - **Clean Execution**: Elegant plain-text optimized for terminal use.
-- **Contract Discipline**: Simple relative pathing and predictable layouts.
+- **Predictable Layout**: Simple relative pathing and clean structures.
 - **Pragmatic Simplicity**: No ivory-tower frameworks or massive overhead.
 
 ## How to Use
 
 To adopt these standards in your own project repository:
 
-1. **Copy**: Copy the `docs` folder into your project and go.
-2. **Preserve Lineage**: Keep the header at the top of the copied files
-   to enable diff tracking, and because it is the right thing to do:
+1. **Copy**: Copy the `docs` folder into your project.
+2. **Go**: Start writing your own usecases and decisions.
+
+*Note: Keep this lineage header at the top of your guide and example files*
+*to stay in sync and pull in the latest standard improvements:*
 
 ```html
 <!-- Derived from Eugene F. Barker (github.com/genebarker/standards) -->
