@@ -3,8 +3,8 @@
 
 *For personal reference only - issues and pull requests are closed.*
 
-A collection of pragmatic, contract-driven standards designed to keep
-your project documentation simple, clean, and less of a chore.
+A collection of pragmatic standards designed to keep your project
+documentation simple, clean, and less of a chore.
 
 ## Architectural Intent
 
