@@ -4,7 +4,7 @@
 This directory contains practical reference examples of the project
 standards in action.
 
-- [usecases][1]: Practical use cases demonstrating step-by-step
+- [usecases][1]: Practical usecases demonstrating step-by-step
   formatting, nested extensions, and variation lists.
 - [decisions][2]: Architecture Decision Records (ADRs) demonstrating
   status tracking, trade-off documentation, and list structure.
