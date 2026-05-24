@@ -21,8 +21,11 @@ documentation, class paths, and attribute names. Some examples:
 Adopt usecase as a single word.
 
 In this project, a usecase is a well-defined term. Collapsing this term into
-a single word is 1) natural (doesn't confuse anyone), and 2) keeps its
-usage in the project clean.
+a single word:
+
+1. Is natural (doesn't confuse anyone).
+2. Keeps its usage in the project clean.
+3. Establishes 'usecase' as a distinct noun.
 
 ## Consequences
 
