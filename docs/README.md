@@ -22,16 +22,18 @@ In general, the files should be written so that they display well using an
   terminal editors with line numbering
 - markup lightly using [GitHub Flavored Markdown][1]; this provides a little
   structure and as a bonus it renders well with most markdown tools
+- use [reference links][5] to keep the body text clean and easy to read
+- use [footnotes][6] to move side-notes out of the main flow of the text
 - use `.md` for the file extension
 
 ## Directory Structure
 
-- [decisions][5]: Architecture Decision Records (ADRs). Use
+- [decisions][7]: Architecture Decision Records (ADRs). Use
   `decision-template.md` to author new decisions, and log them in
   `decision-list.md`.
-- [usecases][6]: System use cases. Use `usecase-template.md` to author new
-  use cases.
-- [examples][7]: Practical reference examples showing formatting,
+- [usecases][8]: System usecases. Use `usecase-template.md` to author new
+  usecases.
+- [examples][9]: Practical reference examples showing formatting,
   extensions, and list syntax.
 
 
@@ -39,6 +41,8 @@ In general, the files should be written so that they display well using an
 [2]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
 [3]: https://www.drawio.com
 [4]: http://staruml.io
-[5]: decisions/
-[6]: usecases/
-[7]: examples/
+[5]: https://www.markdownguide.org/basic-syntax/#reference-style-links
+[6]: https://www.markdownguide.org/extended-syntax/#footnotes
+[7]: decisions/
+[8]: usecases/
+[9]: examples/
