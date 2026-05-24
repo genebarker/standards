@@ -10,7 +10,7 @@ Home for decisions we're considering.
 
 Home for decisions currently in practice.
 
-## Deprecated
+## Retired
 
 Home for decisions that we no longer use. We reserve the right to change our
 minds and make things better!

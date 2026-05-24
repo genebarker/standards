@@ -14,7 +14,7 @@ Home for decisions currently in practice.
 - [001 Document Architecture Decisions][1]
 - [002 Adopt Usecase as Single Word][2]
 
-## Deprecated
+## Retired
 
 Home for decisions that we no longer use. We reserve the right to change our
 minds and make things better!
