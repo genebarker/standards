@@ -40,5 +40,6 @@ To adopt these standards in your own project repository:
 
 *When docsync flags outdated templates, the upstream clone is at*
 *`temp/docsync/`. Ask your AI agent: "grep for Template headers,*
-*compare versions against `temp/docsync/`, and adapt any outdated*
-*files to the new structure while preserving all content."*
+*compare versions against `temp/docsync/`, adapt any outdated files*
+*to the new structure preserving all content, and bump each file's*
+*Template version stamp to match."*
