@@ -4,7 +4,7 @@ Brief sentences describing context of use.
 
 ## Primary Actor
 
-User Type 1, User Type 2
+Business User One, Business User Two
 
 ## Precondition(s)
 
