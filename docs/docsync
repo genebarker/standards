@@ -14,9 +14,9 @@ import difflib
 import argparse
 import subprocess
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 LINEAGE_HEADER = "<!-- Derived from Eugene F. Barker"
-TEMPLATE_HEADER = "<!-- Template: genebarker/standards"
+TEMPLATE_HEADER = "<!-- Template: "
 
 def scan_for_derived_files(repo_root):
     """
@@ -57,29 +57,31 @@ def scan_for_derived_files(repo_root):
                     pass
     return derived_files
 
-def extract_template_version(abs_path):
+def extract_template_info(abs_path):
     """
     Reads the first 3 lines of a file looking for the template header.
-    Returns the version string (e.g. '1.0') or None if not found.
+    Returns (template_name, version) or (None, None) if not found.
     """
     try:
         with open(abs_path, 'r', encoding='utf-8', errors='ignore') as f:
             for _ in range(3):
                 line = f.readline()
                 if TEMPLATE_HEADER in line:
-                    # Parse: <!-- Template: genebarker/standards vX.Y ...
-                    parts = line.split(' v')
-                    if len(parts) >= 2:
+                    # Parse: <!-- Template: <name> vX.Y -->
+                    rest = line[len(TEMPLATE_HEADER):].strip()
+                    parts = rest.rsplit(' v', 1)
+                    if len(parts) == 2:
+                        name = parts[0].strip()
                         version = parts[1].split()[0].strip()
-                        return version
+                        return name, version
     except Exception:
         pass
-    return None
+    return None, None
 
 def scan_for_template_files(repo_root):
     """
     Scans repo_root/docs for files containing the template header.
-    Returns a dict mapping relative paths to their version strings.
+    Returns a dict mapping relative paths to (template_name, version).
     """
     template_files = {}
     docs_dir = os.path.join(repo_root, 'docs')
@@ -96,10 +98,10 @@ def scan_for_template_files(repo_root):
         for file in files:
             if file.endswith('.md'):
                 abs_path = os.path.join(root, file)
-                version = extract_template_version(abs_path)
-                if version is not None:
+                name, version = extract_template_info(abs_path)
+                if name is not None:
                     rel_path = os.path.relpath(abs_path, repo_root)
-                    template_files[rel_path] = version
+                    template_files[rel_path] = (name, version)
     return template_files
 
 def is_git_dirty(downstream_dir):
@@ -169,17 +171,40 @@ def get_upstream_dir(downstream_dir, upstream_arg=None):
 def get_outdated_templates(downstream_dir, upstream_dir):
     """
     Compares template versions between downstream and upstream.
-    Returns a list of (rel_path, down_version, up_version) tuples.
+
+    Returns:
+      named:   [(rel_path, down_version, up_version)] for path-matched
+               files (list files) — reported individually.
+      counted: {template_name: (count, down_version, up_version)} for
+               project files (e.g. copied usecases) — reported as totals.
     """
     downstream_templates = scan_for_template_files(downstream_dir)
     upstream_templates = scan_for_template_files(upstream_dir)
-    outdated = []
-    for rel_path, down_version in sorted(downstream_templates.items()):
-        if rel_path in upstream_templates:
-            up_version = upstream_templates[rel_path]
-            if down_version != up_version:
-                outdated.append((rel_path, down_version, up_version))
-    return outdated
+
+    upstream_by_name = {
+        name: version
+        for name, version in upstream_templates.values()
+    }
+    upstream_paths = set(upstream_templates.keys())
+
+    named = []
+    counted = {}
+
+    for rel_path, (name, down_version) in sorted(
+            downstream_templates.items()):
+        if name not in upstream_by_name:
+            continue
+        up_version = upstream_by_name[name]
+        if down_version == up_version:
+            continue
+        if rel_path in upstream_paths:
+            named.append((rel_path, down_version, up_version))
+        else:
+            if name not in counted:
+                counted[name] = [0, down_version, up_version]
+            counted[name][0] += 1
+
+    return named, counted
 
 def cmd_status(downstream_dir, upstream_dir):
     downstream_files = scan_for_derived_files(downstream_dir)
@@ -228,12 +253,23 @@ def cmd_status(downstream_dir, upstream_dir):
             new_count += 1
             print(f"[NEW UPSTREAM STANDARD]: {rel_path}")
 
-    # 3. Spotting outdated templates (path-matched only, no diff)
-    outdated_templates = get_outdated_templates(downstream_dir, upstream_dir)
-    template_outdated_count = len(outdated_templates)
-    for rel_path, down_version, up_version in outdated_templates:
+    # 3. Spotting outdated templates (no diff — inform only)
+    named_outdated, counted_outdated = get_outdated_templates(
+        downstream_dir, upstream_dir
+    )
+    template_outdated_count = (
+        len(named_outdated)
+        + sum(v[0] for v in counted_outdated.values())
+    )
+    for rel_path, down_version, up_version in named_outdated:
         print(
             f"[TEMPLATE OUTDATED]: {rel_path}"
+            f" (v{down_version} -> v{up_version})"
+        )
+    for name, (count, down_version, up_version) in sorted(
+            counted_outdated.items()):
+        print(
+            f"[TEMPLATE OUTDATED]: {count} file(s) using {name}"
             f" (v{down_version} -> v{up_version})"
         )
 
@@ -313,10 +349,22 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
                 print(f"Error copying new standard {rel_path}: {e}")
                 
     # 3. Report outdated templates (inform only, never updated)
-    outdated_templates = get_outdated_templates(downstream_dir, upstream_dir)
-    for rel_path, down_version, up_version in outdated_templates:
+    named_outdated, counted_outdated = get_outdated_templates(
+        downstream_dir, upstream_dir
+    )
+    template_outdated_count = (
+        len(named_outdated)
+        + sum(v[0] for v in counted_outdated.values())
+    )
+    for rel_path, down_version, up_version in named_outdated:
         print(
             f"[TEMPLATE OUTDATED]: {rel_path}"
+            f" (v{down_version} -> v{up_version})"
+        )
+    for name, (count, down_version, up_version) in sorted(
+            counted_outdated.items()):
+        print(
+            f"[TEMPLATE OUTDATED]: {count} file(s) using {name}"
             f" (v{down_version} -> v{up_version})"
         )
 
@@ -325,10 +373,10 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
     print(f"  Files Updated:          {updates_made}")
     print(f"  New Files Copied:       {copies_made}")
     print(f"  Retired Files Removed:  {removals_made}")
-    print(f"  Templates Outdated:     {len(outdated_templates)}")
+    print(f"  Templates Outdated:     {template_outdated_count}")
 
     if updates_made == 0 and copies_made == 0 and removals_made == 0:
-        if outdated_templates:
+        if template_outdated_count > 0:
             print(
                 "Standards are up-to-date. "
                 "Outdated templates require manual attention."
@@ -338,7 +386,7 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
 
     return True
 
-HELP_TEXT = """DOCSYNC(1.1.0)              Standards Reference              DOCSYNC(1.1.0)
+HELP_TEXT = """DOCSYNC(1.2.0)              Standards Reference              DOCSYNC(1.2.0)
 
 NAME
     docsync - Maintain project standards alignment with zero metadata
