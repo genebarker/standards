@@ -1,3 +1,4 @@
+<!-- Template: genebarker/standards v1.0 (Content is project property) -->
 # 123 - Some Title
 
 Brief sentences describing context of use.
