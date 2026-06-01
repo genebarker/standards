@@ -31,8 +31,8 @@ In general, the files should be written so that they display well using an
 - [decisions][7]: Architecture Decision Records (ADRs). Use
   `decision-template.md` to author new decisions, and log them in
   `decision-list.md`.
-- [usecases][8]: System usecases. Use `usecase-template.md` to author
-  new usecases, log in `usecase-index.md`, and, if applicable,
+- [usecases][8]: System usecases. Use `usecase-template.md` to author new
+  usecases, log them in `usecase-index.md`, and, if applicable,
   `live-usecases.md`.
 - [examples][9]: Practical reference examples showing formatting,
   extensions, and list syntax.
