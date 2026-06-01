@@ -1,3 +1,4 @@
+<!-- Template: genebarker/standards v1.0 (Content is project property) -->
 # Primary Actors
 
 This document defines the primary actors of the system.

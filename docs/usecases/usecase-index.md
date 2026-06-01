@@ -1,3 +1,4 @@
+<!-- Template: genebarker/standards v1.0 (Content is project property) -->
 # Usecase Index
 
 A master registry of our usecase pipeline, backlog, and history.

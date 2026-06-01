@@ -1,3 +1,4 @@
+<!-- Template: genebarker/standards v1.0 (Content is project property) -->
 # Decision List
 
 This is a list of the project's architecture and design decisions.
