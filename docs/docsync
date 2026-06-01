@@ -14,6 +14,7 @@ import difflib
 import argparse
 import subprocess
 
+VERSION = "1.0.1"
 LINEAGE_HEADER = "<!-- Derived from Eugene F. Barker"
 
 def scan_for_derived_files(repo_root):
@@ -127,6 +128,7 @@ def cmd_status(downstream_dir, upstream_dir):
     new_count = 0
     retired_count = 0
     
+    print(f"docsync {VERSION}")
     print(f"Scanning downstream project: {downstream_dir}")
     print(f"Using upstream standards:    {upstream_dir}")
     print("=" * 60)
@@ -196,6 +198,7 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
     copies_made = 0
     removals_made = 0
     
+    print(f"docsync {VERSION}")
     print(f"Updating downstream project: {downstream_dir}")
     print(f"Using upstream standards:    {upstream_dir}")
     print("=" * 60)
@@ -248,7 +251,7 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
         
     return True
 
-HELP_TEXT = """DOCSYNC(1)                  Standards Reference                  DOCSYNC(1)
+HELP_TEXT = """DOCSYNC(1.0.1)              Standards Reference              DOCSYNC(1.0.1)
 
 NAME
     docsync - Maintain project standards alignment with zero metadata
@@ -352,10 +355,17 @@ def main():
                 upstream_content = f.read()
                 
             if local_content != upstream_content:
+                up_version = "unknown"
+                for line in upstream_content.splitlines():
+                    if line.startswith('VERSION ='):
+                        val = line.split('=')[1].strip()
+                        up_version = val.replace('"', '').replace("'", "")
+                        break
+                        
                 shutil.copy2(upstream_script, local_script)
                 print(
-                    "[UPDATED]: docsync has been updated to the latest "
-                    "upstream version."
+                    "[UPDATED]: docsync has been updated to version "
+                    f"{up_version}."
                 )
                 print("Please re-run your command.")
                 sys.exit(0)
