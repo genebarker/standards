@@ -14,8 +14,9 @@ import difflib
 import argparse
 import subprocess
 
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 LINEAGE_HEADER = "<!-- Derived from Eugene F. Barker"
+TEMPLATE_HEADER = "<!-- Template: genebarker/standards"
 
 def scan_for_derived_files(repo_root):
     """
@@ -55,6 +56,51 @@ def scan_for_derived_files(repo_root):
                 except Exception:
                     pass
     return derived_files
+
+def extract_template_version(abs_path):
+    """
+    Reads the first 3 lines of a file looking for the template header.
+    Returns the version string (e.g. '1.0') or None if not found.
+    """
+    try:
+        with open(abs_path, 'r', encoding='utf-8', errors='ignore') as f:
+            for _ in range(3):
+                line = f.readline()
+                if TEMPLATE_HEADER in line:
+                    # Parse: <!-- Template: genebarker/standards vX.Y ...
+                    parts = line.split(' v')
+                    if len(parts) >= 2:
+                        version = parts[1].split()[0].strip()
+                        return version
+    except Exception:
+        pass
+    return None
+
+def scan_for_template_files(repo_root):
+    """
+    Scans repo_root/docs for files containing the template header.
+    Returns a dict mapping relative paths to their version strings.
+    """
+    template_files = {}
+    docs_dir = os.path.join(repo_root, 'docs')
+    if not os.path.isdir(docs_dir):
+        return template_files
+
+    ignore_dirs = {
+        '.git', '.venv', 'node_modules', '__pycache__',
+        'target', 'bin', 'obj'
+    }
+
+    for root, dirs, files in os.walk(docs_dir):
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        for file in files:
+            if file.endswith('.md'):
+                abs_path = os.path.join(root, file)
+                version = extract_template_version(abs_path)
+                if version is not None:
+                    rel_path = os.path.relpath(abs_path, repo_root)
+                    template_files[rel_path] = version
+    return template_files
 
 def is_git_dirty(downstream_dir):
     """
@@ -120,19 +166,34 @@ def get_upstream_dir(downstream_dir, upstream_arg=None):
         print(f"Error: Failed to fetch standards from GitHub. {e}")
         sys.exit(1)
 
+def get_outdated_templates(downstream_dir, upstream_dir):
+    """
+    Compares template versions between downstream and upstream.
+    Returns a list of (rel_path, down_version, up_version) tuples.
+    """
+    downstream_templates = scan_for_template_files(downstream_dir)
+    upstream_templates = scan_for_template_files(upstream_dir)
+    outdated = []
+    for rel_path, down_version in sorted(downstream_templates.items()):
+        if rel_path in upstream_templates:
+            up_version = upstream_templates[rel_path]
+            if down_version != up_version:
+                outdated.append((rel_path, down_version, up_version))
+    return outdated
+
 def cmd_status(downstream_dir, upstream_dir):
     downstream_files = scan_for_derived_files(downstream_dir)
     upstream_files = scan_for_derived_files(upstream_dir)
-    
+
     drift_count = 0
     new_count = 0
     retired_count = 0
-    
+
     print(f"docsync {VERSION}")
     print(f"Scanning downstream project: {downstream_dir}")
     print(f"Using upstream standards:    {upstream_dir}")
     print("=" * 60)
-    
+
     # 1. Diffing and spotting retired standards
     for rel_path, down_abs in sorted(downstream_files.items()):
         if rel_path in upstream_files:
@@ -142,7 +203,7 @@ def cmd_status(downstream_dir, upstream_dir):
                     down_lines = f.readlines()
                 with open(up_abs, 'r', encoding='utf-8') as f:
                     up_lines = f.readlines()
-                    
+
                 if down_lines != up_lines:
                     drift_count += 1
                     print(f"\n[DRIFT DETECTED]: {rel_path}")
@@ -160,20 +221,31 @@ def cmd_status(downstream_dir, upstream_dir):
         else:
             retired_count += 1
             print(f"[RETIRED UPSTREAM]: {rel_path}")
-            
+
     # 2. Spotting new upstream standards
     for rel_path in sorted(upstream_files.keys()):
         if rel_path not in downstream_files:
             new_count += 1
             print(f"[NEW UPSTREAM STANDARD]: {rel_path}")
-            
+
+    # 3. Spotting outdated templates (path-matched only, no diff)
+    outdated_templates = get_outdated_templates(downstream_dir, upstream_dir)
+    template_outdated_count = len(outdated_templates)
+    for rel_path, down_version, up_version in outdated_templates:
+        print(
+            f"[TEMPLATE OUTDATED]: {rel_path}"
+            f" (v{down_version} -> v{up_version})"
+        )
+
     print("=" * 60)
     print("Sync Summary:")
     print(f"  Drifts Detected:        {drift_count}")
     print(f"  Retired Upstream:       {retired_count}")
     print(f"  New Upstream Standards: {new_count}")
-    
-    if drift_count > 0 or retired_count > 0 or new_count > 0:
+    print(f"  Templates Outdated:     {template_outdated_count}")
+
+    if drift_count > 0 or retired_count > 0 or new_count > 0 \
+            or template_outdated_count > 0:
         return False
     else:
         print("All standards are fully aligned and in sync!")
@@ -240,18 +312,33 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
             except Exception as e:
                 print(f"Error copying new standard {rel_path}: {e}")
                 
+    # 3. Report outdated templates (inform only, never updated)
+    outdated_templates = get_outdated_templates(downstream_dir, upstream_dir)
+    for rel_path, down_version, up_version in outdated_templates:
+        print(
+            f"[TEMPLATE OUTDATED]: {rel_path}"
+            f" (v{down_version} -> v{up_version})"
+        )
+
     print("=" * 60)
     print("Update Summary:")
     print(f"  Files Updated:          {updates_made}")
     print(f"  New Files Copied:       {copies_made}")
     print(f"  Retired Files Removed:  {removals_made}")
-    
+    print(f"  Templates Outdated:     {len(outdated_templates)}")
+
     if updates_made == 0 and copies_made == 0 and removals_made == 0:
-        print("All standards are already up-to-date. No action needed.")
-        
+        if outdated_templates:
+            print(
+                "Standards are up-to-date. "
+                "Outdated templates require manual attention."
+            )
+        else:
+            print("All standards are already up-to-date. No action needed.")
+
     return True
 
-HELP_TEXT = """DOCSYNC(1.0.1)              Standards Reference              DOCSYNC(1.0.1)
+HELP_TEXT = """DOCSYNC(1.1.0)              Standards Reference              DOCSYNC(1.1.0)
 
 NAME
     docsync - Maintain project standards alignment with zero metadata
@@ -262,29 +349,43 @@ SYNOPSIS
     docsync -h | --help
 
 DESCRIPTION
-    A lightweight, zero-metadata protocol to detect and resolve alignment 
+    A lightweight, zero-metadata protocol to detect and resolve alignment
     drift in standard files across project repositories.
+
+    Two types of files are tracked:
+
+    Lineage files  Fully owned by upstream. Marked with:
+                   <!-- Derived from Eugene F. Barker ... -->
+                   docsync will diff and update these automatically.
+
+    Template files Project-owned content built from an upstream template.
+                   Marked with:
+                   <!-- Template: genebarker/standards vX.Y ... -->
+                   docsync reports version drift only — content is never
+                   touched. Bring Jaz in to apply structural updates while
+                   preserving your content.
 
 COMMANDS
     status (verify)
-        Scan this project for standard file drifts, retired files, or new 
-        upstream standards. Exits with code 1 if drifts are detected.
-        
+        Scan this project for standard file drifts, retired files, new
+        upstream standards, and outdated templates. Exits with code 1
+        if any issues are detected.
+
     update
-        Safely bring this project into alignment with the latest upstream 
-        standards. Overwrites drifted files, copies new standards, and 
-        deletes retired ones.
-        
-        This command aborts if the downstream docs/ directory contains 
+        Safely bring this project into alignment with the latest upstream
+        standards. Overwrites drifted lineage files, copies new standards,
+        and deletes retired ones. Never touches template files.
+
+        This command aborts if the downstream docs/ directory contains
         uncommitted or untracked git changes.
 
 OPTIONS
     -f, --force
         Bypass the downstream git safety check during an update.
-        
+
     --upstream <path>
-        Override the path to the upstream standards repository (defaults to
-        fetching the master branch from GitHub).
+        Override the path to the upstream standards repository (defaults
+        to fetching the master branch from GitHub).
 
 EXAMPLES
     Check alignment of the Messiah III project:
