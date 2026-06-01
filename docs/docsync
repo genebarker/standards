@@ -1,0 +1,376 @@
+#!/usr/bin/env python3
+"""
+docsync - Maintain project standards alignment with zero metadata.
+
+A lightweight command line tool to detect changes, drift, retired standards, and
+new upstream standards in downstream repositories by comparing them against a shallow
+clone of the master standards repository.
+"""
+
+import sys
+import os
+import shutil
+import difflib
+import argparse
+import subprocess
+
+LINEAGE_HEADER = "<!-- Derived from Eugene F. Barker"
+
+def scan_for_derived_files(repo_root):
+    """
+    Scans repo_root/docs for files containing the lineage header.
+    Returns a dictionary mapping relative paths to absolute paths.
+    """
+    derived_files = {}
+    docs_dir = os.path.join(repo_root, 'docs')
+    if not os.path.isdir(docs_dir):
+        return derived_files
+        
+    ignore_dirs = {
+        '.git', '.venv', 'node_modules', '__pycache__', 
+        'target', 'bin', 'obj'
+    }
+    
+    for root, dirs, files in os.walk(docs_dir):
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        for file in files:
+            # Check files that could contain our markdown lineage header
+            if file.endswith('.md'):
+                abs_path = os.path.join(root, file)
+                try:
+                    with open(
+                        abs_path, 'r', 
+                        encoding='utf-8', 
+                        errors='ignore'
+                    ) as f:
+                        first_lines = "".join(
+                            f.readline() for _ in range(5)
+                        )
+                        if LINEAGE_HEADER in first_lines:
+                            rel_path = os.path.relpath(
+                                abs_path, repo_root
+                            )
+                            derived_files[rel_path] = abs_path
+                except Exception:
+                    pass
+    return derived_files
+
+def is_git_dirty(downstream_dir):
+    """
+    Checks if the downstream docs/ folder has any uncommitted 
+    or untracked changes.
+    """
+    try:
+        res = subprocess.run(
+            ['git', 'rev-parse', '--is-inside-work-tree'],
+            cwd=downstream_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        if res.returncode != 0:
+            return False
+            
+        status_res = subprocess.run(
+            ['git', 'status', '--porcelain', '--', 'docs/'],
+            cwd=downstream_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True
+        )
+        return len(status_res.stdout.strip()) > 0
+    except Exception:
+        return False
+
+def get_upstream_dir(downstream_dir, upstream_arg=None):
+    """
+    Resolves upstream directory. If a path is provided, use it.
+    Otherwise, clone the master standards repo 1 deep into temp/docsync.
+    """
+    if upstream_arg:
+        return os.path.abspath(upstream_arg)
+        
+    # Check if we are running inside the master standards repo itself
+    if os.path.basename(downstream_dir) == 'standards':
+        return downstream_dir
+        
+    temp_dir = os.path.join(downstream_dir, 'temp', 'docsync')
+    
+    # Clean up old temp clone if it exists to ensure freshness
+    if os.path.exists(temp_dir):
+        try:
+            shutil.rmtree(temp_dir)
+        except Exception:
+            pass
+            
+    print("Fetching latest standards from GitHub...")
+    try:
+        subprocess.run(
+            [
+                'git', 'clone', '--depth', '1', 
+                'https://github.com/genebarker/standards.git', 
+                temp_dir
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+        return temp_dir
+    except Exception as e:
+        print(f"Error: Failed to fetch standards from GitHub. {e}")
+        sys.exit(1)
+
+def cmd_status(downstream_dir, upstream_dir):
+    downstream_files = scan_for_derived_files(downstream_dir)
+    upstream_files = scan_for_derived_files(upstream_dir)
+    
+    drift_count = 0
+    new_count = 0
+    retired_count = 0
+    
+    print(f"Scanning downstream project: {downstream_dir}")
+    print(f"Using upstream standards:    {upstream_dir}")
+    print("=" * 60)
+    
+    # 1. Diffing and spotting retired standards
+    for rel_path, down_abs in sorted(downstream_files.items()):
+        if rel_path in upstream_files:
+            up_abs = upstream_files[rel_path]
+            try:
+                with open(down_abs, 'r', encoding='utf-8') as f:
+                    down_lines = f.readlines()
+                with open(up_abs, 'r', encoding='utf-8') as f:
+                    up_lines = f.readlines()
+                    
+                if down_lines != up_lines:
+                    drift_count += 1
+                    print(f"\n[DRIFT DETECTED]: {rel_path}")
+                    print("-" * 60)
+                    diff = difflib.unified_diff(
+                        up_lines, down_lines,
+                        fromfile=f"upstream/{rel_path}",
+                        tofile=f"downstream/{rel_path}",
+                        n=3
+                    )
+                    sys.stdout.writelines(diff)
+                    print("-" * 60)
+            except Exception as e:
+                print(f"Error reading file {rel_path}: {e}")
+        else:
+            retired_count += 1
+            print(f"[RETIRED UPSTREAM]: {rel_path}")
+            
+    # 2. Spotting new upstream standards
+    for rel_path in sorted(upstream_files.keys()):
+        if rel_path not in downstream_files:
+            new_count += 1
+            print(f"[NEW UPSTREAM STANDARD]: {rel_path}")
+            
+    print("=" * 60)
+    print("Sync Summary:")
+    print(f"  Drifts Detected:        {drift_count}")
+    print(f"  Retired Upstream:       {retired_count}")
+    print(f"  New Upstream Standards: {new_count}")
+    
+    if drift_count > 0 or retired_count > 0 or new_count > 0:
+        return False
+    else:
+        print("All standards are fully aligned and in sync!")
+        return True
+
+def cmd_update(downstream_dir, upstream_dir, force=False):
+    if not force and is_git_dirty(downstream_dir):
+        print(
+            f"Error: The target docs/ folder in '{downstream_dir}' "
+            "has uncommitted or untracked changes."
+        )
+        print(
+            "Commit, stash, or discard them before updating, "
+            "or use --force (-f) to override."
+        )
+        sys.exit(1)
+        
+    downstream_files = scan_for_derived_files(downstream_dir)
+    upstream_files = scan_for_derived_files(upstream_dir)
+    
+    updates_made = 0
+    copies_made = 0
+    removals_made = 0
+    
+    print(f"Updating downstream project: {downstream_dir}")
+    print(f"Using upstream standards:    {upstream_dir}")
+    print("=" * 60)
+    
+    # 1. Update drifted files and remove retired files
+    for rel_path, down_abs in sorted(downstream_files.items()):
+        if rel_path in upstream_files:
+            up_abs = upstream_files[rel_path]
+            try:
+                with open(down_abs, 'r', encoding='utf-8') as f:
+                    down_content = f.read()
+                with open(up_abs, 'r', encoding='utf-8') as f:
+                    up_content = f.read()
+                    
+                if down_content != up_content:
+                    with open(down_abs, 'w', encoding='utf-8') as f:
+                        f.write(up_content)
+                    print(f"[UPDATED]: {rel_path}")
+                    updates_made += 1
+            except Exception as e:
+                print(f"Error updating file {rel_path}: {e}")
+        else:
+            try:
+                os.remove(down_abs)
+                print(f"[REMOVED RETIRED]: {rel_path}")
+                removals_made += 1
+            except Exception as e:
+                print(f"Error removing retired file {rel_path}: {e}")
+                
+    # 2. Copy new upstream files
+    for rel_path, up_abs in sorted(upstream_files.items()):
+        if rel_path not in downstream_files:
+            down_abs = os.path.join(downstream_dir, rel_path)
+            try:
+                os.makedirs(os.path.dirname(down_abs), exist_ok=True)
+                shutil.copy2(up_abs, down_abs)
+                print(f"[COPIED NEW]: {rel_path}")
+                copies_made += 1
+            except Exception as e:
+                print(f"Error copying new standard {rel_path}: {e}")
+                
+    print("=" * 60)
+    print("Update Summary:")
+    print(f"  Files Updated:          {updates_made}")
+    print(f"  New Files Copied:       {copies_made}")
+    print(f"  Retired Files Removed:  {removals_made}")
+    
+    if updates_made == 0 and copies_made == 0 and removals_made == 0:
+        print("All standards are already up-to-date. No action needed.")
+        
+    return True
+
+HELP_TEXT = """DOCSYNC(1)                  Standards Reference                  DOCSYNC(1)
+
+NAME
+    docsync - Maintain project standards alignment with zero metadata
+
+SYNOPSIS
+    docsync status [--upstream <path>]
+    docsync update [--upstream <path>] [-f]
+    docsync -h | --help
+
+DESCRIPTION
+    A lightweight, zero-metadata protocol to detect and resolve alignment 
+    drift in standard files across project repositories.
+
+COMMANDS
+    status (verify)
+        Scan this project for standard file drifts, retired files, or new 
+        upstream standards. Exits with code 1 if drifts are detected.
+        
+    update
+        Safely bring this project into alignment with the latest upstream 
+        standards. Overwrites drifted files, copies new standards, and 
+        deletes retired ones.
+        
+        This command aborts if the downstream docs/ directory contains 
+        uncommitted or untracked git changes.
+
+OPTIONS
+    -f, --force
+        Bypass the downstream git safety check during an update.
+        
+    --upstream <path>
+        Override the path to the upstream standards repository (defaults to
+        fetching the master branch from GitHub).
+
+EXAMPLES
+    Check alignment of the Messiah III project:
+        $ docs/docsync status
+
+    Safely pull latest standard changes into m3:
+        $ docs/docsync update
+"""
+
+def main():
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print(HELP_TEXT)
+        sys.exit(0)
+
+    # Intercept command and downstream repo context
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    downstream_dir = os.path.abspath(os.path.join(script_dir, '..'))
+
+    parser = argparse.ArgumentParser(
+        prog="docsync",
+        add_help=False
+    )
+    
+    subparsers = parser.add_subparsers(dest="command")
+    
+    # 1. Status subcommand
+    parser_status = subparsers.add_parser(
+        "status", 
+        aliases=["verify"], 
+        add_help=False
+    )
+    parser_status.add_argument(
+        "--upstream"
+    )
+    
+    # 2. Update subcommand
+    parser_update = subparsers.add_parser(
+        "update", 
+        add_help=False
+    )
+    parser_update.add_argument(
+        "--upstream"
+    )
+    parser_update.add_argument(
+        "-f", "--force", 
+        action="store_true"
+    )
+    
+    # Default to printing help if no command is passed
+    if len(sys.argv) == 1:
+        print(HELP_TEXT)
+        sys.exit(0)
+        
+    args = parser.parse_args()
+    
+    # Resolve upstream (fetches remote master unless local override is passed)
+    upstream_dir = get_upstream_dir(downstream_dir, args.upstream)
+    
+    # 0. Self-update check
+    local_script = os.path.abspath(__file__)
+    upstream_script = os.path.join(upstream_dir, 'docs', 'docsync')
+    
+    if os.path.exists(upstream_script) and local_script != upstream_script:
+        try:
+            with open(local_script, 'r', encoding='utf-8') as f:
+                local_content = f.read()
+            with open(upstream_script, 'r', encoding='utf-8') as f:
+                upstream_content = f.read()
+                
+            if local_content != upstream_content:
+                shutil.copy2(upstream_script, local_script)
+                print(
+                    "[UPDATED]: docsync has been updated to the latest "
+                    "upstream version."
+                )
+                print("Please re-run your command.")
+                sys.exit(0)
+        except Exception as e:
+            print(f"Warning: Self-update check failed. {e}")
+        
+    if args.command in ("status", "verify"):
+        success = cmd_status(downstream_dir, upstream_dir)
+        sys.exit(0 if success else 1)
+    elif args.command == "update":
+        cmd_update(downstream_dir, upstream_dir, force=args.force)
+        sys.exit(0)
+    else:
+        print(HELP_TEXT)
+        sys.exit(0)
+
+if __name__ == '__main__':
+    main()
