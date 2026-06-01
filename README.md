@@ -21,6 +21,7 @@ To adopt these standards in your own project repository:
 
 1. **Copy**: Copy the `docs` folder into your project.
 2. **Go**: Start writing your own usecases and decisions.
+3. **Sync**: Run `docs/docsync` to stay in sync.
 
 *Note: Keep this lineage header at the top of your guide and example files*
 *to stay in sync and pull in the latest standard improvements:*
