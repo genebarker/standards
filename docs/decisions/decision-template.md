@@ -1,4 +1,4 @@
-<!-- Template: genebarker/standards v1.0 (Content is project property) -->
+<!-- Template: decision-template v1.0 -->
 # [Number] - [Title: Short Noun Phrase]
 
 ## Status
