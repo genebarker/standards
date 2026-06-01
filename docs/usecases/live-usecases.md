@@ -1,4 +1,4 @@
-<!-- Template: genebarker/standards v1.0 (Content is project property) -->
+<!-- Template: live-usecases v1.0 -->
 # Live Usecases
 
 These are the implemented usecases currently running in production,
