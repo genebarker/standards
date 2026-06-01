@@ -29,3 +29,10 @@ To adopt these standards in your own project repository:
 ```html
 <!-- Derived from Eugene F. Barker (github.com/genebarker/standards) -->
 ```
+
+*Note: List and template files carry this header so docsync can alert you*
+*when their structure has improved upstream. Content remains yours:*
+
+```html
+<!-- Template: genebarker/standards v1.0 (Content is project property) -->
+```
