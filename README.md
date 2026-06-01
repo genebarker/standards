@@ -30,9 +30,15 @@ To adopt these standards in your own project repository:
 <!-- Derived from Eugene F. Barker (github.com/genebarker/standards) -->
 ```
 
-*Note: List and template files carry this header so docsync can alert you*
-*when their structure has improved upstream. Content remains yours:*
+*Note: List and template files carry this header so docsync can alert*
+*you when their structure has improved upstream. The template name*
+*identifies the source; content is entirely yours:*
 
 ```html
-<!-- Template: genebarker/standards v1.0 (Content is project property) -->
+<!-- Template: usecase-template v1.0 -->
 ```
+
+*When docsync flags outdated templates, the upstream clone is at*
+*`temp/docsync/`. Ask your AI agent: "grep for Template headers,*
+*compare versions against `temp/docsync/`, and adapt any outdated*
+*files to the new structure while preserving all content."*
