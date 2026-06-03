@@ -5,12 +5,11 @@ This folder contains the project's documentation. The documentation is
 written in plain text, then supplemented as-needed with pictures, diagrams,
 and models:
 
-Type        | Format
------------ | --------------------------------
-Plain text  | [Markdown (GitHub Flavored)][1]
-Pictures    | [PNG Files][2]
-Diagrams    | [draw.io][3] (context, box)
-Models      | [StarUML][4] (ERD, object model)
+Type       | Format
+---------- | ----------------------------------------------
+Plain text | [Markdown (GitHub Flavored)][1]
+Pictures   | [PNG Files][2]
+Diagrams   | [draw.io][3] (context, box, ERD, object model)
 
 ## Markdown Guidelines
 
@@ -22,28 +21,27 @@ In general, the files should be written so that they display well using an
   terminal editors with line numbering
 - markup lightly using [GitHub Flavored Markdown][1]; this provides a little
   structure and as a bonus it renders well with most markdown tools
-- use [reference links][5] to keep the body text clean and easy to read
-- use [footnotes][6] to move side-notes out of the main flow of the text
+- use [reference links][4] to keep the body text clean and easy to read
+- use [footnotes][5] to move side-notes out of the main flow of the text
 - use `.md` for the file extension
 
 ## Directory Structure
 
-- [decisions][7]: Architecture Decision Records (ADRs). Use
+- [decisions][6]: Architecture Decision Records (ADRs). Use
   `decision-template.md` to author new decisions, and log them in
   `decision-list.md`.
-- [usecases][8]: System usecases. Use `usecase-template.md` to author new
+- [usecases][7]: System usecases. Use `usecase-template.md` to author new
   usecases, log them in `usecase-index.md`, and, if applicable,
   `live-usecases.md`.
-- [examples][9]: Practical reference examples showing formatting,
+- [examples][8]: Practical reference examples showing formatting,
   extensions, and list syntax.
 
 
 [1]: https://github.github.com/gfm/
 [2]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
 [3]: https://www.drawio.com
-[4]: http://staruml.io
-[5]: https://www.markdownguide.org/basic-syntax/#reference-style-links
-[6]: https://www.markdownguide.org/extended-syntax/#footnotes
-[7]: decisions/
-[8]: usecases/
-[9]: examples/
+[4]: https://www.markdownguide.org/basic-syntax/#reference-style-links
+[5]: https://www.markdownguide.org/extended-syntax/#footnotes
+[6]: decisions/
+[7]: usecases/
+[8]: examples/
