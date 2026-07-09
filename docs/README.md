@@ -36,6 +36,10 @@ In general, the files should be written so that they display well using an
 - [examples][8]: Practical reference examples showing formatting,
   extensions, and list syntax.
 
+These are the standard homes. Projects are free to add their own
+folders when project artifacts need one - e.g. `models/` for design
+models, or `graphics/` for the source artwork behind app resources.
+
 
 [1]: https://github.github.com/gfm/
 [2]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
