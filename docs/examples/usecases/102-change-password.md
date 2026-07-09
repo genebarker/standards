@@ -11,7 +11,7 @@ All users
 
 ## Precondition(s)
 
-- User is [logged in to system][1].
+- User is [logged in to system][101].
 
 ## Main Success Scenario
 
@@ -39,11 +39,11 @@ None.
 
 ## Related Information
 
-- See the [zxcvbn][2] utility from Dropbox for one method of determining
+- See the [zxcvbn][a] utility from Dropbox for one method of determining
   password strength.
-- See the [zxcvbn-python][3] for the Python port of zxcvbn.
+- See the [zxcvbn-python][b] for the Python port of zxcvbn.
 
 
-[1]: 101-login-to-system.md
-[2]: https://github.com/dropbox/zxcvbn
-[3]: https://github.com/dwolfhub/zxcvbn-python
+[101]: 101-login-to-system.md
+[a]: https://github.com/dropbox/zxcvbn
+[b]: https://github.com/dwolfhub/zxcvbn-python

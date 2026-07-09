@@ -53,7 +53,7 @@ All users
 
 5a. Password marked for reset:
 
-  1. See [change password][1].
+  1. See [change password][102].
 
 ## Technology & Data Variations
 
@@ -66,9 +66,9 @@ All users
 
 ## Related Information
 
-- See the [DenyHosts][1] utility for the inspiration behind the deny
+- See the [DenyHosts][a] utility for the inspiration behind the deny
   threshold and age reset functionality.
 
 
-[1]: 102-change-password.md
-[2]: http://denyhosts.sourceforge.net/
+[102]: 102-change-password.md
+[a]: http://denyhosts.sourceforge.net/

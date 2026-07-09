@@ -10,7 +10,7 @@ Payroll Manager, Payroll Officer, Executive
 
 ## Precondition(s)
 
-- User is [logged in to system][1].
+- User is [logged in to system][101].
 - There are pay runs in the system.
 
 ## Main Success Scenario
@@ -48,4 +48,4 @@ None.
 None.
 
 
-[1]: 101-login-to-system.md
+[101]: 101-login-to-system.md

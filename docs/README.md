@@ -22,6 +22,14 @@ In general, the files should be written so that they display well using an
 - markup lightly using [GitHub Flavored Markdown][1]; this provides a little
   structure and as a bonus it renders well with most markdown tools
 - use [reference links][4] to keep the body text clean and easy to read
+  - when the link targets another numbered doc (a usecase or decision), name
+    the label after that doc's number - e.g. `[017]` for
+    `017-review-name-request.md` - so the target is visible without
+    following it
+  - for anything else, a bare number is easy to mistake for a doc
+    reference; use a letter (`[a]`) or a keyword instead - whichever
+    reads better - so a bracketed number always means "jump to a
+    numbered doc"
 - use [footnotes][5] to move side-notes out of the main flow of the text
 - use `.md` for the file extension
 
