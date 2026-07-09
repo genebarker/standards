@@ -14,7 +14,7 @@ import difflib
 import argparse
 import subprocess
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 LINEAGE_HEADER = "<!-- Derived from Eugene F. Barker"
 TEMPLATE_HEADER = "<!-- Template: "
 
@@ -163,6 +163,14 @@ def get_upstream_dir(downstream_dir, upstream_arg=None):
             stderr=subprocess.DEVNULL,
             check=True
         )
+        # Keep the clone invisible to the downstream repo's git so
+        # adopting the standards requires no .gitignore followup
+        ignore_path = os.path.join(
+            os.path.dirname(temp_dir), '.gitignore'
+        )
+        if not os.path.exists(ignore_path):
+            with open(ignore_path, 'w', encoding='utf-8') as f:
+                f.write("*\n")
         return temp_dir
     except Exception as e:
         print(f"Error: Failed to fetch standards from GitHub. {e}")
@@ -386,7 +394,7 @@ def cmd_update(downstream_dir, upstream_dir, force=False):
 
     return True
 
-HELP_TEXT = """DOCSYNC(1.2.0)              Standards Reference              DOCSYNC(1.2.0)
+HELP_TEXT = """DOCSYNC(1.3.0)              Standards Reference              DOCSYNC(1.3.0)
 
 NAME
     docsync - Maintain project standards alignment with zero metadata
