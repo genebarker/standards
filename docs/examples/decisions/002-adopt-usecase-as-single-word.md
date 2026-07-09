@@ -1,5 +1,5 @@
 <!-- Derived from Eugene F. Barker (github.com/genebarker/standards) MIT -->
-# 2 - Adopt Usecase as Single Word
+# 002 - Adopt Usecase as Single Word
 
 ## Status
 

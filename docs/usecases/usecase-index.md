@@ -5,15 +5,15 @@ A master registry of our usecase pipeline, backlog, and history.
 
 ## Reference
 
-* [Live Usecases][1] - *All live usecases in production*
-* [Primary Actors][2] - *User types and access rules*
-* [Usecase Template][3] - *Template for new usecases*
+* [Live Usecases][a] - *All live usecases in production*
+* [Primary Actors][b] - *User types and access rules*
+* [Usecase Template][c] - *Template for new usecases*
 
 ## Proposed
 
 These are the usecases currently in our pipeline.
 
-* [101 Usecase Title][4]
+* [101 Usecase Title][101]
 * 102 Usecase Title
 
 ## Shelved
@@ -31,10 +31,10 @@ prevent ID collision.
 * 111 Usecase Title - *Retired* [^2]
 
 
-[1]: live-usecases.md
-[2]: primary-actors.md
-[3]: usecase-template.md
-[4]: 101-usecase-title.md
+[a]: live-usecases.md
+[b]: primary-actors.md
+[c]: usecase-template.md
+[101]: 101-usecase-title.md
 
 [^1]: Retired in V2 since no longer in scope.
 [^2]: Retired in V3; functionality absorbed by Usecase 054.

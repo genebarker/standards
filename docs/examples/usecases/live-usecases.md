@@ -6,8 +6,8 @@ organized by functional area.
 
 ## Reference
 
-* [Usecase Index][1] - *Master registry of all usecases*
-* [Primary Actors][2] - *Detailed roles and profiles*
+* [Usecase Index][a] - *Master registry of all usecases*
+* [Primary Actors][b] - *Detailed roles and profiles*
 
 ## Primary Actors
 
@@ -17,16 +17,16 @@ organized by functional area.
 
 ## System Security
 
-* `MOE` [101 Login to System][3]
-* `MOE` [102 Change Password][4]
+* `MOE` [101 Login to System][101]
+* `MOE` [102 Change Password][102]
 
 ## Payroll Reporting
 
-* `M-E` [103 View and Print Report][5]
+* `M-E` [103 View and Print Report][103]
 
 
-[1]: usecase-index.md
-[2]: primary-actors.md
-[3]: 101-login-to-system.md
-[4]: 102-change-password.md
-[5]: 103-view-and-print-report.md
+[a]: usecase-index.md
+[b]: primary-actors.md
+[101]: 101-login-to-system.md
+[102]: 102-change-password.md
+[103]: 103-view-and-print-report.md

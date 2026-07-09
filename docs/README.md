@@ -7,9 +7,9 @@ and models:
 
 Type       | Format
 ---------- | ----------------------------------------------
-Plain text | [Markdown (GitHub Flavored)][1]
-Pictures   | [PNG Files][2]
-Diagrams   | [draw.io][3] (context, box, ERD, object model)
+Plain text | [Markdown (GitHub Flavored)][a]
+Pictures   | [PNG Files][b]
+Diagrams   | [draw.io][c] (context, box, ERD, object model)
 
 ## Markdown Guidelines
 
@@ -19,9 +19,9 @@ In general, the files should be written so that they display well using an
 - think **elegant plain text** designed for the terminal
 - limit line length to (76) characters; this makes it easy to edit well on
   terminal editors with line numbering
-- markup lightly using [GitHub Flavored Markdown][1]; this provides a little
+- markup lightly using [GitHub Flavored Markdown][a]; this provides a little
   structure and as a bonus it renders well with most markdown tools
-- use [reference links][4] to keep the body text clean and easy to read
+- use [reference links][d] to keep the body text clean and easy to read
   - when the link targets another numbered doc (a usecase or decision), name
     the label after that doc's number - e.g. `[017]` for
     `017-review-name-request.md` - so the target is visible without
@@ -30,18 +30,18 @@ In general, the files should be written so that they display well using an
     reference; use a letter (`[a]`) or a keyword instead - whichever
     reads better - so a bracketed number always means "jump to a
     numbered doc"
-- use [footnotes][5] to move side-notes out of the main flow of the text
+- use [footnotes][e] to move side-notes out of the main flow of the text
 - use `.md` for the file extension
 
 ## Directory Structure
 
-- [decisions][6]: Architecture Decision Records (ADRs). Use
+- [decisions][f]: Architecture Decision Records (ADRs). Use
   `decision-template.md` to author new decisions, and log them in
   `decision-list.md`.
-- [usecases][7]: System usecases. Use `usecase-template.md` to author new
+- [usecases][g]: System usecases. Use `usecase-template.md` to author new
   usecases, log them in `usecase-index.md`, and, if applicable,
   `live-usecases.md`.
-- [examples][8]: Practical reference examples showing formatting,
+- [examples][h]: Practical reference examples showing formatting,
   extensions, and list syntax.
 
 These are the standard homes. Projects are free to add their own
@@ -49,11 +49,11 @@ folders when project artifacts need one - e.g. `models/` for design
 models, or `graphics/` for the source artwork behind app resources.
 
 
-[1]: https://github.github.com/gfm/
-[2]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
-[3]: https://www.drawio.com
-[4]: https://www.markdownguide.org/basic-syntax/#reference-style-links
-[5]: https://www.markdownguide.org/extended-syntax/#footnotes
-[6]: decisions/
-[7]: usecases/
-[8]: examples/
+[a]: https://github.github.com/gfm/
+[b]: https://en.wikipedia.org/wiki/Portable_Network_Graphics
+[c]: https://www.drawio.com
+[d]: https://www.markdownguide.org/basic-syntax/#reference-style-links
+[e]: https://www.markdownguide.org/extended-syntax/#footnotes
+[f]: decisions/
+[g]: usecases/
+[h]: examples/

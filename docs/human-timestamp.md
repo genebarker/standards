@@ -15,6 +15,6 @@ in this example, `1503` is 3:03 PM.
 - Seconds and timezone are left out because (1) they are harder to read;
   and (2) they are unnecessary in most cases.
 
-*Adapted from [shrikenet][1] by the same author.*
+*Adapted from [shrikenet][a] by the same author.*
 
-[1]: https://github.com/genebarker/shrikenet
+[a]: https://github.com/genebarker/shrikenet

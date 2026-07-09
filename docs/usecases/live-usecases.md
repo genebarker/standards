@@ -6,8 +6,8 @@ organized by functional area.
 
 ## Reference
 
-* [Usecase Index][1] - *Master registry of all usecases*
-* [Primary Actors][2] - *Detailed roles and profiles*
+* [Usecase Index][a] - *Master registry of all usecases*
+* [Primary Actors][b] - *Detailed roles and profiles*
 
 ## Primary Actors
 
@@ -18,16 +18,16 @@ organized by functional area.
 
 ## Functional Area One
 
-* `UP` [101 Usecase Title][3]
-* `U-` [102 Usecase Title][4]
+* `UP` [101 Usecase Title][101]
+* `U-` [102 Usecase Title][102]
 
 ## Functional Area Two
 
-* `-P` [103 Usecase Title][5]
+* `-P` [103 Usecase Title][103]
 
 
-[1]: usecase-index.md
-[2]: primary-actors.md
-[3]: 101-usecase-title.md
-[4]: 102-usecase-title.md
-[5]: 103-usecase-title.md
+[a]: usecase-index.md
+[b]: primary-actors.md
+[101]: 101-usecase-title.md
+[102]: 102-usecase-title.md
+[103]: 103-usecase-title.md

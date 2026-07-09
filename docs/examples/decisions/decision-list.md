@@ -11,8 +11,8 @@ Home for decisions we're considering.
 
 Home for decisions currently in practice.
 
-- [001 Document Architecture Decisions][1]
-- [002 Adopt Usecase as Single Word][2]
+- [001 Document Architecture Decisions][001]
+- [002 Adopt Usecase as Single Word][002]
 
 ## Retired
 
@@ -25,5 +25,5 @@ Home for decisions we considered, then decided not to proceed with at this
 time.
 
 
-[1]: 001-document-architecture-decisions.md
-[2]: 002-adopt-usecase-as-single-word.md
+[001]: 001-document-architecture-decisions.md
+[002]: 002-adopt-usecase-as-single-word.md
