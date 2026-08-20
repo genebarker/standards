@@ -33,6 +33,10 @@ In general, the files should be written so that they display well using an
 - use [footnotes][e] to move side-notes out of the main flow of the text
 - use `.md` for the file extension
 
+These guidelines cover the files in this folder. Text written for other
+destinations - GitHub issues, email, word processor documents - follows
+the convention of that destination.
+
 ## Directory Structure
 
 - [decisions][f]: Architecture Decision Records (ADRs). Use
